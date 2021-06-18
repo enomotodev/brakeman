@@ -53,4 +53,15 @@ class GroupsController < ApplicationController
       eval(params[:x]) # should not warn
     end
   end
+
+  # From https://github.com/presidentbeef/brakeman/issues/1492
+  def enum_include_check
+    status = "#{params[:status]}"
+    if Group.statuses.include? status
+      @status = status.to_sym
+      @countries = Group.send(@status) # Should not warn
+    else
+      redirect_to root_path, notice: 'Invalid status'
+    end
+  end
 end
